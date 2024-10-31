@@ -6,28 +6,20 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Objects;
 
 @Slf4j
 @UtilityClass
 public class IcuCharsetDetector {
 
-    public static void main() throws IOException, URISyntaxException {
+    public static void main() throws IOException {
 
-        URI uri = Objects.requireNonNull(IcuCharsetDetector.class.getClassLoader().getResource("test.txt"))
-                .toURI();
-        Path filePath = Paths.get(uri);
+        InputStream inputStream = TikaCharsetDetector.class.getClassLoader().getResourceAsStream("test.txt");
 
         CharsetDetector detector = new CharsetDetector();
-        // Read all bytes from the file into a byte array
-        byte[] fileBytes = Files.readAllBytes(filePath);
-        detector.setText(fileBytes);
+
+        detector.setText(inputStream);
 
         CharsetMatch charsetMatch = detector.detect();
         log.info("charsetMatch={}", charsetMatch.getName());
