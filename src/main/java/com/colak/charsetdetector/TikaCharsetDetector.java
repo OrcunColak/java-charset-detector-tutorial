@@ -9,49 +9,34 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MediaType;
 import org.apache.tika.parser.txt.UniversalEncodingDetector;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Objects;
 
 @Slf4j
 @UtilityClass
 public class TikaCharsetDetector {
 
-    public static void main() throws IOException, URISyntaxException {
+    public static void main() throws IOException {
+        InputStream inputStream = TikaCharsetDetector.class.getClassLoader().getResourceAsStream("test.txt");
 
-        URI uri = Objects.requireNonNull(TikaCharsetDetector.class.getClassLoader().getResource("test.txt"))
-                .toURI();
-        Path filePath = Paths.get(uri);
-
-        detectCharset(filePath);
-        detectFileType(filePath);
+        detectCharset(inputStream);
+        detectFileType(inputStream);
     }
 
-    private static void detectCharset(Path filePath) throws IOException {
+    private static void detectCharset(InputStream inputStream) throws IOException {
         EncodingDetector encodingDetector = new UniversalEncodingDetector();
-        byte[] fileBytes = Files.readAllBytes(filePath);
 
         // Create a ByteArrayInputStream from the byte array
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(fileBytes);
+        // ByteArrayInputStream inputStream = new ByteArrayInputStream(fileBytes);
         Charset detectedCharset = encodingDetector.detect(inputStream, new Metadata());
         log.info("detectedCharset={}", detectedCharset.displayName());
     }
 
-    private void detectFileType(Path filePath) throws IOException {
+    private void detectFileType(InputStream inputStream) throws IOException {
         // Implement the content type detection logic
         Detector detector = new DefaultDetector();
         Metadata metadata = new Metadata();
-
-        byte[] fileBytes = Files.readAllBytes(filePath);
-
-        // Create a ByteArrayInputStream from the byte array
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(fileBytes);
 
         MediaType mediaType = detector.detect(inputStream, metadata);
         log.info("detectFileType={}", mediaType.toString());
